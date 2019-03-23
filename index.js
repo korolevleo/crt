@@ -607,6 +607,7 @@ class FullChart {
         currentChart = buildChart(chartDataNumber);
     }
     window.onresize = redrawChart;
+    window.onorientationchange = redrawChart;
     document.getElementById('nextChart').onclick = () => {
         chartDataNumber = (chartDataNumber + 1) % chartData.length;
         redrawChart();
