@@ -613,7 +613,7 @@ class FullChart {
         redrawChart();
     };
     document.getElementById('previousChart').onclick = () => {
-        chartDataNumber = (chartDataNumber + 3) % chartData.length;
+        chartDataNumber = (chartDataNumber + chartData.length - 1) % chartData.length;
         redrawChart();
     }
 })()
