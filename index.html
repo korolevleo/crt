@@ -1,0 +1,53 @@
+<html>
+    <head>
+        <title>Chart</title>
+        <style>
+            #chartContainer {
+                height: calc(calc(90vw - 168px) - 2em);
+            }
+            #chartLegend {
+                height: 2em;
+            }
+            #scrollContainer {
+                height: 10vw;
+            }
+            #buttonContainer {
+                margin-top: 10px;
+                height: 40px;
+                display: flex;
+                justify-content: space-between;
+            }
+            #navigationContainer {
+                display: flex;
+                padding-top: 10px;
+                height: 40px;
+                width: 100%;
+                justify-content: space-between;
+            }
+            #navigationContainer button {
+                width: 50%;
+            }
+            @media (min-aspect-ratio: 1/1) {
+                #chartContainer {
+                    height: calc(calc(90vh - 168px) - 2em);
+                }
+                #scrollContainer {
+                    height: 10vh;
+                }
+            }
+            </style>
+    </head>
+    <body>
+        <h2>Followers</h2>
+        <div id="chartContainer" style="width: 100%;"></div>
+        <div id="chartLegend" style="width: 100%;"></div>
+        <div id="scrollContainer" style="width: 100%;"></div>
+        <div id="buttonContainer" style="width: 100%;"></div>
+        <div id="navigationContainer">
+            <button id="nextChart">Next chart</button>
+            <button id="previousChart">Previous chart</button>
+        </div>
+        <script src="chart_data.js"></script>
+        <script src="index.js"></script>
+    </body>
+</html>
