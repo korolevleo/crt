@@ -24,8 +24,15 @@
                 width: 100%;
                 justify-content: space-between;
             }
-            #navigationContainer button {
-                width: 50%;
+            #navigationContainer > div {
+                display: flex;
+                width: 33.3%;
+                text-align: center;
+                border: solid 2px rgba(180, 180, 180, 0.5);
+                border-radius: 5px;
+            }
+            #navigationContainer div div{
+                margin: auto;
             }
             @media (min-aspect-ratio: 1/1) {
                 #chartContainer {
@@ -49,8 +56,15 @@
         <div id="scrollContainer" style="width: 100%;"></div>
         <div id="buttonContainer" style="width: 100%;"></div>
         <div id="navigationContainer">
-            <button id="nextChart">Next chart</button>
-            <button id="previousChart">Previous chart</button>
+            <div id="nextChart">
+                <div>Next chart</div>
+            </div>
+            <div id="switchMode">
+                <div id="switchModeText">Switch to night mode</div>
+            </div>
+            <div id="previousChart">
+                <div>Previous chart</div>
+            </div>
         </div>
         <script src="chart_data.js"></script>
         <script src="index.js"></script>

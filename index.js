@@ -2,6 +2,11 @@ const LINEAR_SCALE_ANIMATION_DURATION = 100;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const SECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const ANIMATION_DEBOUNCE = 200;
+const THEME = {
+    dark: 'rgba(180, 180, 180, 0.5)',
+    weakDark: 'rgba(180, 180, 180, 0.3)',
+    light: 'rgba(180, 180, 180, 0.2)'
+}
 
 function isMobile() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -162,15 +167,13 @@ class LeveledChart extends BaseChart {
         const visibleMaxY = Math.max(...currentVisibleVertices.map((arr, i) => this.hiddenLines.indexOf(i) < 0 ? Math.max(...arr) : 0));
         if (this.visibleMaxY === visibleMaxY) {
             return;
-        } else {
-            if (this.linesSvg && this.linesSvgContainer) {
-                this.animateLinesFade(this.linesSvg, this.linesSvgContainer, this.visibleMaxY < visibleMaxY);
-            }
+        }
+        if (this.linesSvg && this.linesSvgContainer) {
+            this.animateLinesFade(this.linesSvg, this.linesSvgContainer, this.visibleMaxY < visibleMaxY);
         }
         this.visibleMaxY = visibleMaxY;
         this.linesSvgContainer = document.createElement('div');
-;       this.linesSvgContainer.position = 'relative';
-        this.linesSvgContainer.style.bottom = chartContainer.offsetHeight + 'px';
+        this.linesSvgContainer.style.position = 'relative';
         this.chartContainer.appendChild(this.linesSvgContainer);
         this.linesSvg = document.createElementNS("http://www.w3.org/2000/svg", 'svg');
         this.linesSvg.setAttribute('width', chartContainer.offsetWidth);
@@ -180,7 +183,7 @@ class LeveledChart extends BaseChart {
         this.linesSvgContainer.appendChild(this.linesSvg);
         for (let i = 0; i < 7; i++) {
             const line = document.createElementNS("http://www.w3.org/2000/svg", 'line');
-            line.setAttribute('stroke', 'rgba(180, 180, 180, 0.5)');
+            line.setAttribute('stroke', THEME.dark);
             line.setAttribute('stroke-width', '1');
             line.setAttribute('x1', '0');
             line.setAttribute('x2', chartContainer.offsetWidth + '');
@@ -247,12 +250,12 @@ class ScrollControl {
         this.grayR = document.createElement('div');
         this.grayR.style.height = this.h + 'px';
         this.grayR.style.width = this.chartContainer.offsetWidth - this.h + 'px';
-        this.grayR.style.backgroundColor = 'rgba(230, 230, 230, 0.5)';
+        this.grayR.style.backgroundColor = THEME.light;
 
         this.grayL = document.createElement('div');
         this.grayL.style.height = this.h + 'px';
         this.grayL.style.width = '0px';
-        this.grayL.style.backgroundColor = 'rgba(230, 230, 230, 0.5)';
+        this.grayL.style.backgroundColor = THEME.light;
 
         this.scrollWindow.appendChild(this.grayL);
         this.scrollWindow.appendChild(this.winL.control);
@@ -380,7 +383,7 @@ class ScrollControl {
         const circle = document.createElement('div');
         circle.style.width = this.h * 1.5 + 'px';
         circle.style.height = this.h * 1.5 + 'px';
-        circle.style.backgroundColor = 'rgba(180, 180, 180, 0.3)';
+        circle.style.backgroundColor = THEME.weakDark;
         circle.style.borderRadius = this.h * 0.75 + 'px';
         circle.style.position = 'relative';
         circle.style.right = this.h * 0.7 + 'px';
@@ -393,7 +396,7 @@ class ScrollControl {
         const control = document.createElement('div');
         control.style.width = this.h * 0.1 + 'px';
         control.style.height = this.h + 'px';
-        control.style.backgroundColor = 'rgba(180, 180, 180, 0.5)';
+        control.style.backgroundColor = THEME.dark;
         control.style.overflow = 'visible';
 
         const circle = this.createCircle();
@@ -407,7 +410,7 @@ class ScrollControl {
         const control = document.createElement('div');
         control.style.width = '20vw';
         control.style.height = this.h * 0.95 + 'px';
-        control.style.borderTop = control.style.borderBottom = `${0.025 * this.h}px solid rgba(180, 180, 180, 0.5)`;
+        control.style.borderTop = control.style.borderBottom = `${0.025 * this.h}px solid ` + THEME.dark;
 
         const circle = this.createCircle();
 
@@ -557,8 +560,8 @@ class FullChart {
             colors.push(chartInfo.colors[name]);
         }
 
-        const chart = new LeveledChart(chartContainer);
-        chart.drawChart(xArr, lines, colors);
+        this.chart = new LeveledChart(chartContainer);
+        this.chart.drawChart(xArr, lines, colors);
 
         this.chartScroll = new ChartScroller(scrollContainer);
         this.chartScroll.drawChart(xArr, lines, colors); 
@@ -567,13 +570,13 @@ class FullChart {
         this.chartLegend.drawLegend(xArr);
 
         this.chartScroll.scrollControl.subscribe((coords) => {
-            chart.redraw(coords);
+            this.chart.redraw(coords);
             this.chartLegend.redrawDays(coords);
         });
 
         for (let i = 0; i < lineLegendNames.length; i++) {
             this.addButton(buttonContainer, () => {
-                chart.changeHidden(i);
+                this.chart.changeHidden(i);
                 this.chartScroll.changeHidden(i);
             }, colors[i], lineLegendNames[i], 100 / lineLegendNames.length);
         }
@@ -635,7 +638,7 @@ class FullChart {
 
         btn.appendChild(svgContainer);
         btn.appendChild(nameContainer);
-        btn.style.border = 'rgba(180, 180, 180, 0.5) 1px solid';
+        btn.style.border = THEME.dark + ' 1px solid';
         btn.onclick = () => {
             onclick();
             show = !show;
@@ -649,13 +652,17 @@ class FullChart {
 }
 
 (() => {
+    const dayModeColor = 'white';
+    const nightModeColor = '#223';
+    let mode = true;
     const buildChart = (n) => {
-        return new FullChart(
+        const chart = new FullChart(
             document.getElementById('chartContainer'),
             document.getElementById('scrollContainer'),
             document.getElementById('chartLegend'),
             document.getElementById('buttonContainer'),
             chartData[n])
+        return chart;
     }
     let chartDataNumber = 0;
     let currentChart = buildChart(chartDataNumber);
@@ -672,5 +679,18 @@ class FullChart {
     document.getElementById('previousChart').onclick = () => {
         chartDataNumber = (chartDataNumber + chartData.length - 1) % chartData.length;
         redrawChart();
+    }
+    const switchModeButton = document.getElementById('switchMode');
+    const switchModeText = document.getElementById('switchModeText');
+    switchModeButton.onclick = () => {
+        mode = !mode;
+        if (mode) {
+            switchModeText.innerText = 'Switch to Night Mode'
+            document.body.style.backgroundColor = dayModeColor;
+        } else {
+            switchModeText.innerText = 'Switch to Day Mode'
+            document.body.style.backgroundColor = nightModeColor;
+        }
+        document.body.style.color = mode ? nightModeColor : dayModeColor;
     }
 })()
