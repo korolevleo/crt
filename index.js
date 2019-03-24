@@ -3,6 +3,10 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const SECONDS_IN_DAY = 1000 * 60 * 60 * 24;
 const ANIMATION_DEBOUNCE = 200;
 
+function isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 class BaseChart {
 
     constructor(chartContainer) {
@@ -301,6 +305,17 @@ class ScrollControl {
         this.winL.ontouchstart = (ev) => {
             this.winX = ev.touches[0].clientX;
             this.moveWinL = true;
+        }
+
+        if (isMobile()) {
+            this.grayL.ontouchstart = (ev) => {
+                this.winX = ev.touches[0].clientX;
+                this.moveWinL = true;
+            }
+            this.grayR.ontouchstart = (ev) => {
+                this.winX = ev.touches[0].clientX;
+                this.moveWinR = true;
+            }
         }
 
         this.clearMovesHandler = () => this.clearMoves();
