@@ -230,6 +230,7 @@ class ScrollControl {
         this.h = chartContainer.clientHeight;
         this.fullWidth = chartContainer.offsetWidth;
         this.chartContainer = chartContainer;
+        this.chartContainer.style.overflow = 'visible';
         this.scrollWindow = document.createElement('div');
         this.scrollWindow.style.height = this.h + 'px';
         this.scrollWindow.style.position = 'relative';
@@ -237,20 +238,11 @@ class ScrollControl {
         this.scrollWindow.style.display = 'flex';
         this.chartContainer.appendChild(this.scrollWindow);
 
-        this.win = document.createElement('div');
-        this.win.style.width = '20vw';
-        this.win.style.height = this.h * 0.95 + 'px';
-        this.win.style.borderTop = this.win.style.borderBottom = `${0.025 * this.h}px solid rgba(180, 180, 180, 0.5)`;
+        this.winL = this.createSideControl();
 
-        this.winL = document.createElement('div');
-        this.winL.style.width = this.h * 0.1 + 'px';
-        this.winL.style.height = this.h + 'px';
-        this.winL.style.backgroundColor = 'rgba(180, 180, 180, 0.5)';
+        this.winR = this.createSideControl();
 
-        this.winR = document.createElement('div');
-        this.winR.style.width = this.h * 0.1 + 'px';
-        this.winR.style.height = this.h + 'px';
-        this.winR.style.backgroundColor = 'rgba(180, 180, 180, 0.5)';
+        this.win = this.createWindowControl();
 
         this.grayR = document.createElement('div');
         this.grayR.style.height = this.h + 'px';
@@ -263,57 +255,63 @@ class ScrollControl {
         this.grayL.style.backgroundColor = 'rgba(230, 230, 230, 0.5)';
 
         this.scrollWindow.appendChild(this.grayL);
-        this.scrollWindow.appendChild(this.winL);
-        this.scrollWindow.appendChild(this.win);
-        this.scrollWindow.appendChild(this.winR);
+        this.scrollWindow.appendChild(this.winL.control);
+        this.scrollWindow.appendChild(this.win.control);
+        this.scrollWindow.appendChild(this.winR.control);
         this.scrollWindow.appendChild(this.grayR);
 
-        this.WW = this.win.offsetWidth;
+        this.WW = this.win.control.offsetWidth;
         this.LW = 0;
         this.RW = this.fullWidth - this.WW;
 
         this.scrollWindow.ondragstart = () => false;
-        this.winL.ondragstart = () => false;
-        this.win.ondragstart = () => false;
-        this.winR.ondragstart = () => false;
+        this.winL.control.ondragstart = () => false;
+        this.win.control.ondragstart = () => false;
+        this.winR.control.ondragstart = () => false;
     
-        this.win.onmousedown = (ev) => {
+        this.win.control.onmousedown = (ev) => {
             this.winX = ev.clientX;
             this.moveWin = true;
         };
 
-        this.win.ontouchstart = (ev) => {
+        this.win.control.ontouchstart = (ev) => {
             this.winX = ev.touches[0].clientX;
+            this.win.circle.style.left = (this.win.control.offsetWidth / 2) - this.h * 0.75;
+            this.win.circle.style.display = 'block';
             this.moveWin = true;
         }
 
-        this.winR.onmousedown = (ev) => {
+        this.winR.control.onmousedown = (ev) => {
             this.winX = ev.clientX;
             this.moveWinR = true;
         };
 
-        this.winR.ontouchstart = (ev) => {
+        this.winR.control.ontouchstart = (ev) => {
             this.winX = ev.touches[0].clientX;
+            this.winR.circle.style.display = 'block';
             this.moveWinR = true;
         }
 
-        this.winL.onmousedown = (ev) => {
+        this.winL.control.onmousedown = (ev) => {
             this.winX = ev.clientX;
             this.moveWinL = true;
         };
 
-        this.winL.ontouchstart = (ev) => {
+        this.winL.control.ontouchstart = (ev) => {
             this.winX = ev.touches[0].clientX;
+            this.winL.circle.style.display = 'block';
             this.moveWinL = true;
         }
 
         if (isMobile()) {
             this.grayL.ontouchstart = (ev) => {
                 this.winX = ev.touches[0].clientX;
+                this.winL.circle.style.display = 'block';
                 this.moveWinL = true;
             }
             this.grayR.ontouchstart = (ev) => {
                 this.winX = ev.touches[0].clientX;
+                this.winR.circle.style.display = 'block';
                 this.moveWinR = true;
             }
         }
@@ -355,7 +353,7 @@ class ScrollControl {
                 this.LW = this.LW + distance;
                 this.WW = this.WW - distance;
                 this.grayL.style.width = this.LW + 'px';
-                this.win.style.width = this.WW + 'px';
+                this.win.control.style.width = this.WW + 'px';
                 this.notify();
             }
             if (this.moveWinR) {
@@ -369,13 +367,54 @@ class ScrollControl {
                 this.RW = this.RW - distance;
                 this.WW = this.WW + distance
                 this.grayR.style.width = this.RW + 'px';
-                this.win.style.width = this.WW + 'px';
+                this.win.control.style.width = this.WW + 'px';
                 this.notify();
             }
         };
 
         this.chartContainer.onmousemove = this.handleMove;
         this.chartContainer.ontouchmove = this.handleMove;
+    }
+
+    createCircle() {
+        const circle = document.createElement('div');
+        circle.style.width = this.h * 1.5 + 'px';
+        circle.style.height = this.h * 1.5 + 'px';
+        circle.style.backgroundColor = 'rgba(180, 180, 180, 0.3)';
+        circle.style.borderRadius = this.h * 0.75 + 'px';
+        circle.style.position = 'relative';
+        circle.style.right = this.h * 0.7 + 'px';
+        circle.style.bottom = this.h * 0.25 + 'px';
+        circle.style.display = 'none';
+        return circle;
+    }
+
+    createSideControl() {
+        const control = document.createElement('div');
+        control.style.width = this.h * 0.1 + 'px';
+        control.style.height = this.h + 'px';
+        control.style.backgroundColor = 'rgba(180, 180, 180, 0.5)';
+        control.style.overflow = 'visible';
+
+        const circle = this.createCircle();
+        
+        control.appendChild(circle);
+
+        return {control, circle};
+    }
+
+    createWindowControl() {
+        const control = document.createElement('div');
+        control.style.width = '20vw';
+        control.style.height = this.h * 0.95 + 'px';
+        control.style.borderTop = control.style.borderBottom = `${0.025 * this.h}px solid rgba(180, 180, 180, 0.5)`;
+
+        const circle = this.createCircle();
+
+        control.appendChild(circle);
+
+        return {control, circle}
+
     }
 
     destroy() {
@@ -391,6 +430,9 @@ class ScrollControl {
         this.moveWinL = false;
         this.moveWinR = false;
         this.moveWin = false;
+        this.winL.circle.style.display = 'none';
+        this.winR.circle.style.display = 'none';
+        this.win.circle.style.display = 'none';
     }
 
     subscribe(fn) {
